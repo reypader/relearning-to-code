@@ -1,4 +1,3 @@
-
 package com.reypader.rtc.chap2.persistence.repositories;
 
 import java.util.UUID;
