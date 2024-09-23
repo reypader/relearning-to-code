@@ -9,16 +9,16 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/local_db
-      - SPRING_DATASOURCE_USERNAME=local_db
-      - SPRING_DATASOURCE_PASSWORD=local_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/chap2
+      - SPRING_DATASOURCE_USERNAME=chap2
+      - SPRING_DATASOURCE_PASSWORD=chap2
       - SPRING_JPA_HIBERNATE_DDL_AUTO=none
   db:
-    image: postgres
+    image: postgres:16.4
     container_name: db
     environment:
-      - POSTGRES_USER=local_db
-      - POSTGRES_PASSWORD=local_db
-      - POSTGRES_DB=local_db
+      - POSTGRES_USER=chap2
+      - POSTGRES_PASSWORD=chap2
+      - POSTGRES_DB=chap2
     ports:
       - "5432:5432"
