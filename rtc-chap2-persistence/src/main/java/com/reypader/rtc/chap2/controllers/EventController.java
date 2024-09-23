@@ -1,9 +1,8 @@
 package com.reypader.rtc.chap2.controllers;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.reypader.rtc.chap2.controllers.resources.Event;
+import com.reypader.rtc.chap2.persistence.entities.PersistedEvent;
+import com.reypader.rtc.chap2.persistence.repositories.PersistendEntityRepository;
+
 import jakarta.validation.Valid;
 
 /**
@@ -22,29 +24,25 @@ import jakarta.validation.Valid;
  */
 @RestController
 public class EventController {
+    private final PersistendEntityRepository eventRepository;
 
-    private Map<UUID, Event> eventRepository = new HashMap<>();
+    public EventController(PersistendEntityRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     @PostMapping("/events/")
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        UUID id = UUID.randomUUID();
-        event.setId(id);
-        eventRepository.put(id, event);
-        return ResponseEntity.status(HttpStatus.CREATED).body(event);
     public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) {
+        PersistedEvent persistedEvent = eventRepository.save(PersistedEvent.fromResource(event));
+        return ResponseEntity.status(HttpStatus.CREATED).body(persistedEvent.toResource());
     }
 
     @GetMapping("/events/{id}")
     public ResponseEntity<Event> getEvent(@PathVariable("id") UUID id) {
-        if (eventRepository.containsKey(id)) {
-            return ResponseEntity.ok(eventRepository.get(id));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return eventRepository.findById(id).map(pe-> ResponseEntity.ok(pe.toResource())).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/events/")
     public ResponseEntity<Collection<Event>> getEvents() {
-        return ResponseEntity.ok(eventRepository.values());
+        return ResponseEntity.ok(eventRepository.findAll().stream().map(PersistedEvent::toResource).collect(Collectors.toSet()));
     }
 }
