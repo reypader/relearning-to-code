@@ -13,6 +13,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=chap2
       - SPRING_DATASOURCE_PASSWORD=chap2
       - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    develop:
+      watch:
+        - action: rebuild
+          path: ./target/rtc-chap2-persistence-0.0.1-SNAPSHOT.jar
   db:
     image: postgres:16.4
     container_name: db
