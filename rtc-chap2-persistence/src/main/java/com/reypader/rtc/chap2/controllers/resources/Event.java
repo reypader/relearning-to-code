@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.Size;
+
 /**
  *
  * @author rmpader
@@ -16,6 +18,7 @@ public class Event {
     @JsonProperty("end")
     private OffsetDateTime eventEnd;
     @JsonProperty("name")
+    @Size(max=50)
     private String eventName;
     
     public UUID getId() {

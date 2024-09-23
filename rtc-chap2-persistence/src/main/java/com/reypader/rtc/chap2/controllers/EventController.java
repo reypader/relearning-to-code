@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.reypader.rtc.chap2.controllers.resources.Event;
+import jakarta.validation.Valid;
 
 /**
  *
@@ -30,6 +31,7 @@ public class EventController {
         event.setId(id);
         eventRepository.put(id, event);
         return ResponseEntity.status(HttpStatus.CREATED).body(event);
+    public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) {
     }
 
     @GetMapping("/events/{id}")
