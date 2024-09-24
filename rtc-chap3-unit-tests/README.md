@@ -1,13 +1,7 @@
-# Chapter 2: Persistence
+# Chapter 3: Unit Tests
 
-Let's built upon our basic application from Chapter 1 and add some persistence layer to it. We'll be using PostgreSQL running on a docker container. We'll also be using liquibase to manage the table structures. For the implementation of the persistence layer itself, we'll go the easy route and make use of Spring Data JPA.
+Continuing from implementing persistence in Chapter 2, we'll be tackling a task that we've been deferring for a while now - unit tests. Admittedly, this is something that many developers defer to later stages as well. However, doing so just leads to a huge debt. Do it late enough and you'll end up with the daunting task of writing unit test for an entirely functional service which will undoubtedly be demotivating.
 
-## Local Setup
-Running things locally is something developers always need to do. Typically, a locally running database is necessary for a service to run. However, one thing I've learned through the years is that having a local database installed can be tricky especially once you start working on different projects that require different database versions. Luckily, Docker is a thing and we can just run a container of the necessary database. Additionally, `docker-compose` simplifies the setup by making the connectivities declarative so the setup becomes portable in case you lose your laptop or something.
+It's also understandable to think that doing it too early seems unnecessary though I would definitely advocate for that. At the very least, though, my take is to forgive ourselves in deferring it for a while at most _until_ we get to a state where we've got the big pieces in place. For example, in this project, we have our database connection set up, a controller, and the initial liquibase changelogs to setup a table. In the past 2 chapters, we've been essentially "setting up" the foundations of what would become a service. We haven't really implemented anything complex yet but the pieces to support it are there for a running service. Likewise, we should also start setting up the foundations of our unit testing "environment". That's an oxymoron, of course, since the idea of unit testing is to test a very small and isolated piece of work without external influences. That said, what we're setting up here is the harnesses around the tests that we will eventually need - specifically once we start testing the Spring Boot app itself.
 
-## DB Structure Management
-A common pitfall of Spring Boot newbies is keeping the Hibernate DDL on. This usually leads to surprises on database structures when running your app. Typically, this is turned off and the database table structures are delegated to a separate team and/or process. To simulate that, we'll be using `Liquibase`. To my surprise, Liquibase now has native SQL support for changelogs. We no longer need to clumsily write SQL strings in XML files such that we can't use the IDE's SQL support for our statements.
-
-## Request Validation
-I've missed implementing validations in the previous chapter so we'll do it here. It's simple enough - almost 3 lines of code. Spring Boot really is magic. Though I don't see any need to explore the `Hibernate Validation` configurations just yet. Out-of-the-box features will do for now.
-
+We'll be writing proper unit tests for the controller that we have so far since that's the only testable code we have. Additionally, we'll be writing integration tests for the app itself with an in-memory database to tests the request routing, and field validations.
