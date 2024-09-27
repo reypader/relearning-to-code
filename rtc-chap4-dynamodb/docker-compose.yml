@@ -9,10 +9,8 @@ services:
     depends_on:
       - dynamodb-local
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/chap4
-      - SPRING_DATASOURCE_USERNAME=chap4
-      - SPRING_DATASOURCE_PASSWORD=chap4
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
     develop:
       watch:
         - action: rebuild
