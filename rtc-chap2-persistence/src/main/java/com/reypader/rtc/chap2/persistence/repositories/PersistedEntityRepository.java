@@ -10,6 +10,6 @@ import com.reypader.rtc.chap2.persistence.entities.PersistedEvent;
  *
  * @author rmpader
  */
-public interface PersistendEntityRepository extends JpaRepository<PersistedEvent, UUID> {
+public interface PersistedEntityRepository extends JpaRepository<PersistedEvent, UUID> {
 
 }

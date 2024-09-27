@@ -17,7 +17,7 @@ import com.reypader.rtc.chap3.persistence.entities.PersistedEvent;
 
 import jakarta.validation.Valid;
 
-import com.reypader.rtc.chap3.persistence.repositories.PersistendEventRepository;
+import com.reypader.rtc.chap3.persistence.repositories.PersistedEventRepository;
 
 /**
  *
@@ -25,9 +25,9 @@ import com.reypader.rtc.chap3.persistence.repositories.PersistendEventRepository
  */
 @RestController
 public class EventController {
-    private final PersistendEventRepository eventRepository;
+    private final PersistedEventRepository eventRepository;
 
-    public EventController(PersistendEventRepository eventRepository) {
+    public EventController(PersistedEventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 

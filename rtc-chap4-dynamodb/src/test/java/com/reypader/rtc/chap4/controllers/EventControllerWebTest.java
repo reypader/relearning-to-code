@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.reypader.rtc.chap4.persistence.entities.PersistedEvent;
-import com.reypader.rtc.chap4.persistence.repositories.PersistendEventRepository;
+import com.reypader.rtc.chap4.persistence.repositories.PersistedEventRepository;
 
 @WebMvcTest(EventController.class)
 class EventControllerWebTest {
@@ -29,7 +29,7 @@ class EventControllerWebTest {
 	private MockMvc mockMvc;
 
 	@MockBean
-	private PersistendEventRepository mockRepo;
+	private PersistedEventRepository mockRepo;
 
 	@Test
 	public void testGetRequest() throws Exception {

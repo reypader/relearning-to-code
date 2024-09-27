@@ -25,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.reypader.rtc.chap3.controllers.resources.Event;
 import com.reypader.rtc.chap3.persistence.entities.PersistedEvent;
-import com.reypader.rtc.chap3.persistence.repositories.PersistendEventRepository;
+import com.reypader.rtc.chap3.persistence.repositories.PersistedEventRepository;
 
 /**
  *
@@ -33,7 +33,7 @@ import com.reypader.rtc.chap3.persistence.repositories.PersistendEventRepository
  */
 public class EventControllerTest {
 
-    private final PersistendEventRepository mockRepo = mock(PersistendEventRepository.class);
+    private final PersistedEventRepository mockRepo = mock(PersistedEventRepository.class);
     private final EventController underTest = new EventController(mockRepo);
 
     @Test

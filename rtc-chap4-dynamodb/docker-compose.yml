@@ -7,7 +7,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - db
+      - dynamodb-local
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/chap4
       - SPRING_DATASOURCE_USERNAME=chap4
@@ -17,12 +17,12 @@ services:
       watch:
         - action: rebuild
           path: ./target/rtc-chap4-dynamodb-0.0.1-SNAPSHOT.jar
-  db:
-    image: postgres:16.4
-    container_name: db
-    environment:
-      - POSTGRES_USER=chap4
-      - POSTGRES_PASSWORD=chap4
-      - POSTGRES_DB=chap4
-    ports:
-      - "5432:5432"
+  dynamodb-local:
+   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+   image: "amazon/dynamodb-local:2.5.2"
+   container_name: dynamodb-local
+   ports:
+     - "8000:8000"
+   volumes:
+     - "./docker/dynamodb:/home/dynamodblocal/data"
+   working_dir: /home/dynamodblocal

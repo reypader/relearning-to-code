@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.reypader.rtc.chap2.controllers.resources.Event;
 import com.reypader.rtc.chap2.persistence.entities.PersistedEvent;
-import com.reypader.rtc.chap2.persistence.repositories.PersistendEntityRepository;
+import com.reypader.rtc.chap2.persistence.repositories.PersistedEntityRepository;
 
 import jakarta.validation.Valid;
 
@@ -24,9 +24,9 @@ import jakarta.validation.Valid;
  */
 @RestController
 public class EventController {
-    private final PersistendEntityRepository eventRepository;
+    private final PersistedEntityRepository eventRepository;
 
-    public EventController(PersistendEntityRepository eventRepository) {
+    public EventController(PersistedEntityRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
