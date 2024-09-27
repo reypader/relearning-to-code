@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,6 @@ import com.reypader.rtc.chap4.persistence.entities.PersistedEvent;
 import com.reypader.rtc.chap4.persistence.repositories.PersistedEventRepository;
 
 /**
- *
  * @author rmpader
  */
 public class EventControllerTest {
@@ -58,7 +58,10 @@ public class EventControllerTest {
 
         ArgumentCaptor<PersistedEvent> captor = ArgumentCaptor.forClass(PersistedEvent.class);
         verify(mockRepo, times(1)).save(captor.capture());
-        assertEquals(captor.getValue(), PersistedEvent.fromResource(testEvent)); // am I being lazy or wise here?
+        PersistedEvent captured = captor.getValue();
+        assertEquals(captured.getEventName(), "test_event");
+        assertEquals(captured.getEventStart(), now);
+        assertEquals(captured.getEventEnd(), later);
         assertEquals(HttpStatus.CREATED, actual.getStatusCode());
         Event body = actual.getBody();
         assertNotNull(body);

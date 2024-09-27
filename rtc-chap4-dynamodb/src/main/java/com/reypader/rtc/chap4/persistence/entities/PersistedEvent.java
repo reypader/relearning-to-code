@@ -5,34 +5,29 @@ import java.util.UUID;
 
 import com.reypader.rtc.chap4.controllers.resources.Event;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 /**
  *
  * @author rmpader
  */
-@Entity
-@Table(name = "events")
+@DynamoDbBean
 public class PersistedEvent {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    
     private UUID id;
-    @Column(name = "start")
-    private OffsetDateTime eventStart;
-    @Column(name = "end")
-    private OffsetDateTime eventEnd;
-    @Column(name = "name")
     private String eventName;
-    @Version
-    @Column(name = "version_lock")
-    private int versionNum;
+    private OffsetDateTime eventStart;
+    private OffsetDateTime eventEnd;
 
+    /*
+     * Note: Only for demonstration's sake. 
+     * 
+     * For better guidance on choosing Partition and Sort Keys, see this page 
+     * https://aws.amazon.com/blogs/database/choosing-the-right-dynamodb-partition-key/
+     */
+    @DynamoDbPartitionKey 
     public UUID getId() {
         return id;
     }
@@ -61,12 +56,8 @@ public class PersistedEvent {
         this.eventName = eventName;
     }
 
-    public int getVersionNum() {
-        return versionNum;
-    }
-
-    public void setVersionNum(int versionNum) {
-        this.versionNum = versionNum;
+    public PersistedEvent() {
+        this.id = UUID.randomUUID();
     }
 
     public static PersistedEvent fromResource(Event event) {
@@ -86,8 +77,8 @@ public class PersistedEvent {
         return pe;
     }
 
-    // for testing purposes only
-    void setId(UUID id2) {
+    // required by Dynamo
+    public void setId(UUID id2) {
         this.id = id2;
     }
 
@@ -96,10 +87,9 @@ public class PersistedEvent {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
         result = prime * result + ((eventStart == null) ? 0 : eventStart.hashCode());
         result = prime * result + ((eventEnd == null) ? 0 : eventEnd.hashCode());
-        result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
-        result = prime * result + versionNum;
         return result;
     }
 
@@ -117,6 +107,11 @@ public class PersistedEvent {
                 return false;
         } else if (!id.equals(other.id))
             return false;
+        if (eventName == null) {
+            if (other.eventName != null)
+                return false;
+        } else if (!eventName.equals(other.eventName))
+            return false;
         if (eventStart == null) {
             if (other.eventStart != null)
                 return false;
@@ -127,16 +122,10 @@ public class PersistedEvent {
                 return false;
         } else if (!eventEnd.equals(other.eventEnd))
             return false;
-        if (eventName == null) {
-            if (other.eventName != null)
-                return false;
-        } else if (!eventName.equals(other.eventName))
-            return false;
-        if (versionNum != other.versionNum)
-            return false;
         return true;
     }
 
+    
     
 
 }
