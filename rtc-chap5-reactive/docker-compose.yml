@@ -1,0 +1,26 @@
+services:
+  rtcchap5persistence:
+    image: rtcchap5persistence
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - dynamodb-local
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    develop:
+      watch:
+        - action: rebuild
+          path: ./target/rtc-chap5-reactive-0.0.1-SNAPSHOT.jar
+  dynamodb-local:
+   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+   image: "amazon/dynamodb-local:2.5.2"
+   container_name: dynamodb-local
+   ports:
+     - "8000:8000"
+   volumes:
+     - "./docker/dynamodb:/home/dynamodblocal/data"
+   working_dir: /home/dynamodblocal
