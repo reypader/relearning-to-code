@@ -1,6 +1,6 @@
 services:
   rtcchap5persistence:
-    image: rtcchap5persistence
+    image: rtcchap5reactive
     build:
       context: .
       dockerfile: ./Dockerfile
