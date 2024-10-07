@@ -18,9 +18,10 @@ import com.reypader.rtc.chap5.persistence.entities.PersistedEvent;
 import jakarta.validation.Valid;
 
 import com.reypader.rtc.chap5.persistence.repositories.PersistedEventRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
- *
  * @author rmpader
  */
 @RestController
@@ -32,18 +33,18 @@ public class EventController {
     }
 
     @PostMapping("/events/")
-    public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) {
-        PersistedEvent persistedEvent = eventRepository.save(PersistedEvent.fromResource(event));
-        return ResponseEntity.status(HttpStatus.CREATED).body(persistedEvent.toResource());
+    public Mono<ResponseEntity<Event>> createEvent(@Valid @RequestBody Event event) {
+        return eventRepository.save(PersistedEvent.fromResource(event))
+                .map(e -> ResponseEntity.status(HttpStatus.CREATED).body(e.toResource()));
     }
 
     @GetMapping("/events/{id}")
-    public ResponseEntity<Event> getEvent(@PathVariable("id") UUID id) {
-        return eventRepository.findById(id).map(pe-> ResponseEntity.ok(pe.toResource())).orElse(ResponseEntity.notFound().build());
+    public Mono<ResponseEntity<Event>> getEvent(@PathVariable("id") UUID id) {
+        return eventRepository.findById(id).map(pe -> ResponseEntity.ok(pe.toResource())).switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @GetMapping("/events/")
-    public ResponseEntity<Collection<Event>> getEvents() {
-        return ResponseEntity.ok(eventRepository.findAll().stream().map(PersistedEvent::toResource).collect(Collectors.toSet()));
+    public ResponseEntity<Flux<Event>> getEvents() {
+        return ResponseEntity.ok(eventRepository.findAll().map(PersistedEvent::toResource));
     }
 }

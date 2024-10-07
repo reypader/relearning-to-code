@@ -5,6 +5,8 @@ import java.util.UUID;
 import java.util.Optional;
 
 import com.reypader.rtc.chap5.persistence.entities.PersistedEvent;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  *
@@ -12,10 +14,10 @@ import com.reypader.rtc.chap5.persistence.entities.PersistedEvent;
  */
 public interface PersistedEventRepository {
 
-    PersistedEvent save(PersistedEvent fromResource);
+    Mono<PersistedEvent> save(PersistedEvent fromResource);
 
-    Optional<PersistedEvent> findById(UUID id);
+    Mono<PersistedEvent> findById(UUID id);
 
-    Collection<PersistedEvent> findAll();
+    Flux<PersistedEvent> findAll();
 
 }
