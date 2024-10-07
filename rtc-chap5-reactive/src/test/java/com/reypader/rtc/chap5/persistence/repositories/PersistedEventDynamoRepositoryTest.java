@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 
 import java.util.Collection;
@@ -33,28 +36,34 @@ public class PersistedEventDynamoRepositoryTest {
     @Autowired
     private PersistedEventDynamoRepository repo;
     @Autowired
-    private DynamoDbTable<PersistedEvent> countryTable;
+    private DynamoDbAsyncTable<PersistedEvent> countryTable;
 
     @BeforeEach
     public void beforeEach() {
-        countryTable.createTable();
+        StepVerifier.create(Mono.fromFuture(countryTable.createTable())).verifyComplete();
     }
 
     @AfterEach
     public void afterEach() {
-        countryTable.deleteTable();
+        StepVerifier.create(Mono.fromFuture(countryTable.deleteTable())).verifyComplete();
     }
 
     @Test
     public void itShouldGetListOfCountries() throws Exception {
         PersistedEvent event = new PersistedEvent();
         event.setEventName("A");
-        PersistedEvent saved = repo.save(event);
-        assertEquals(event, saved);
-        Optional<PersistedEvent> found = repo.findById(event.getId());
-        assertEquals(event, found.get());
-        Collection<PersistedEvent> foundAll = repo.findAll();
-        assertEquals(1, foundAll.size());
-        assertEquals(event, foundAll.stream().findFirst().get());
+
+        StepVerifier.create(repo.save(event))
+                .assertNext(saved -> assertEquals(event, saved))
+                .verifyComplete();
+
+        StepVerifier.create(repo.findById(event.getId()))
+                .assertNext(found -> assertEquals(event, found))
+                .verifyComplete();
+
+        StepVerifier.create(repo.findAll())
+                .assertNext(found -> assertEquals(event, found))
+                .verifyComplete();
+
     }
 }
