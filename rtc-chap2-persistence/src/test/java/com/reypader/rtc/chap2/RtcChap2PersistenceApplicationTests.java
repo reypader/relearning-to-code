@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class RtcChap2PersistenceApplicationTests {
+public class RtcChap2PersistenceApplicationTests {
 
 	@Test
 	void contextLoads() {

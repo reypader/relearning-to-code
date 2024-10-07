@@ -46,7 +46,7 @@ public class PersistedEventDynamoRepositoryTest {
     }
 
     @Test
-    public void itShouldGetListOfCountries() throws Exception {
+    public void testPersistence() throws Exception {
         PersistedEvent event = new PersistedEvent();
         event.setEventName("A");
         PersistedEvent saved = repo.save(event);

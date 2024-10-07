@@ -11,7 +11,7 @@ import com.reypader.rtc.chap3.controllers.EventController;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class RtcChap3PersistenceApplicationTests {
+public class RtcChap3PersistenceApplicationTests {
 
 	@Autowired
 	private EventController eventController;
