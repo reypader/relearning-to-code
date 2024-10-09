@@ -1,0 +1,8 @@
+services:
+  rtcchap6reactive:
+    image: rtcchap6reactive
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:8080
