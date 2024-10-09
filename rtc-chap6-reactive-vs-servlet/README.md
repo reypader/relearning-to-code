@@ -57,3 +57,16 @@ We'll be using K6 to perform the tests. The `/instant` and `/delated` endpoints 
 - Observe resource usage of the various services under load.
 - Find a way to verify that we have equivalent configurations between the three services.
 - Verify the amount of worker threads needed by the Synchronous Service to satisfy the test.
+
+## Running the tests
+1. Build and run the intended service variant. Starting from the `rtc-chap6-reactive-vs-servlet` directory:
+```shell
+$ cd rtc-chap6-<variant> 
+$ mvn clean install
+$ docker-compose up
+```
+2. Run the desired service variant. Starting from the `rtc-chap6-reactive-vs-servlet` directory:
+```shell
+$ cd k6
+$ k6 run api-test.js
+```
