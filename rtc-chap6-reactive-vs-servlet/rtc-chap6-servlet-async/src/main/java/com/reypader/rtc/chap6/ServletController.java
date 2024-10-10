@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 
 @RestController
 public class ServletController {
-    private final Random randomizer = new Random();
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     @GetMapping("/instant")
@@ -22,7 +21,7 @@ public class ServletController {
     public CompletableFuture<String> delayed() {
         CompletableFuture<String> completableFuture = new CompletableFuture<>();
         executor.submit(() -> {
-            Thread.sleep(randomizer.nextInt(100, 10000));
+            Thread.sleep(10000);
             completableFuture.complete("DELAYED");
             return null;
         });

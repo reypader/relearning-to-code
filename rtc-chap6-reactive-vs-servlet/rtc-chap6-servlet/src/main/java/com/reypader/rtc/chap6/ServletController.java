@@ -7,7 +7,6 @@ import java.util.Random;
 
 @RestController
 public class ServletController {
-    private final Random randomizer = new Random();
 
     @GetMapping("/instant")
     public String instant() {
@@ -16,7 +15,7 @@ public class ServletController {
 
     @GetMapping("/delayed")
     public String delayed() throws Exception {
-        Thread.sleep(randomizer.nextInt(100, 10000));
+        Thread.sleep(10000);
         return "DELAYED";
     }
 }

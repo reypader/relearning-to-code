@@ -7,7 +7,7 @@ export const options = {
         'http_req_duration{request_type:readiness}': ['p(99)<100'],
         'http_req_duration{request_type:liveness}': ['p(99)<100'],
         'http_req_duration{request_type:instant}': ['p(99)<100'],
-        'http_req_duration{request_type:delayed}': ['p(99)<10000'],
+        'http_req_duration{request_type:delayed}': ['p(90)==10000'],
     },
     scenarios: {
         readiness: {
