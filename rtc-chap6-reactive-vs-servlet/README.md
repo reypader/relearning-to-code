@@ -4,11 +4,11 @@ A recurring problem at work is a service that keeps on degrading if downstream s
 The observed behavior is other use-cases that are not dependent on the same slow service are being affected because of thread starvation.
 
 
-In this chapter, we'll be implementing a service in 3 ways: (1) using a servlet-based service with a synchronous controller; (2) using a servlet-based service with an asynchronous controller; and (3) using webflux.
+In this chapter, we'll be implementing a service in 4 ways: (1) using a servlet-based service with a synchronous controller; (2) using a servlet-based service with an asynchronous controller for the delayed endpoint; (3) just like (2) but with both delayed and instant endpoints delegating to an async process; and (4) using webflux.
 The services will all have the following endpoints:
 - `/actuator/health/liveness` and `/actuator/health/readiness` to simulate the probes from K8s.
 - `/instant` which instantly responds with `HTTP 200`.
-- `/delayed` which responds with `HTTP 200` with a random delay between 100 and 10,000 milliseconds.
+- `/delayed` which responds with `HTTP 200` with a delay of 10 seconds.
 
 Ideally, calls to `/instant` will always be serviced successfully regardless of how degraded the performance of `/delayed` is. 
 However, the observed behavior on synchronous services is that all endpoints, including the probes, experience drastic degradations.
@@ -19,36 +19,49 @@ We'll be using K6 to perform the tests. The `/instant` and `/delated` endpoints 
 ## Results
 ### Synchronous Servlet Service
 ```
-     http_req_duration..............: avg=27.62s   min=2.53ms   med=26.75s  max=59.09s p(90)=51.29s p(95)=54.04s
-       { expected_response:true }...: avg=27.62s   min=2.53ms   med=26.75s  max=59.09s p(90)=51.29s p(95)=54.04s
-     ✗ { request_type:delayed }.....: avg=30s      min=967.79ms med=29.57s  max=59.09s p(90)=52.67s p(95)=55.19s
-     ✗ { request_type:instant }.....: avg=25.89s   min=2.53ms   med=24.37s  max=56.81s p(90)=50.14s p(95)=53.22s
-     ✗ { request_type:liveness }....: avg=25.35s   min=7.86ms   med=23.9s   max=53.46s p(90)=47.82s p(95)=51.29s
+     http_req_duration..............: avg=44.54s   min=2.02ms  med=58.41s  max=1m0s    p(90)=59.99s   p(95)=1m0s
+       { expected_response:true }...: avg=29.9s    min=2.02ms  med=31.53s  max=58.94s  p(90)=56.05s   p(95)=57.97s
+       { request_type:delayed }.....: avg=47.94s   min=10s     med=59.99s  max=1m0s    p(90)=59.99s   p(95)=1m0s
+       { request_type:instant }.....: avg=42.13s   min=2.02ms  med=56.06s  max=1m0s    p(90)=59.99s   p(95)=1m0s
+       { request_type:liveness }....: avg=40.32s   min=13.73ms med=47.97s  max=1m0s    p(90)=59.99s   p(95)=59.99s
+       { request_type:readiness }...: avg=40.3s    min=11.4ms  med=47.97s  max=1m0s    p(90)=59.99s   p(95)=59.99s
 ```
 **Observations:**
 - All requests are degraded. Worse still, the requests to `/delayed` seems to have had a compounding negative effect pushing the latencies beyond 50 seconds.
 
 
-### Asynchronous Servlet Service
+### Asynchronous Servlet Service (/delayed only)
 ```
-     http_req_duration..............: avg=2.16s   min=682µs   med=5.72ms max=9.98s    p(90)=7.68s  p(95)=8.86s
-       { expected_response:true }...: avg=2.16s   min=682µs   med=5.72ms max=9.98s    p(90)=7.68s  p(95)=8.86s
-     ✓ { request_type:delayed }.....: avg=4.98s   min=121.7ms med=4.74s  max=9.98s    p(90)=9.03s  p(95)=9.6s
-     ✓ { request_type:instant }.....: avg=3.69ms  min=682µs   med=3.32ms max=103.78ms p(90)=5.45ms p(95)=5.93ms
-     ✓ { request_type:liveness }....: avg=7.58ms  min=1.9ms   med=5.23ms max=131.61ms p(90)=7.02ms p(95)=8.24ms
-     ✓ { request_type:readiness }...: avg=7.57ms  min=1.98ms  med=5.22ms max=131.68ms p(90)=7.02ms p(95)=7.9ms
+     http_req_duration..............: avg=4.14s   min=875µs  med=5.77ms max=10.08s   p(90)=10s     p(95)=10s
+       { expected_response:true }...: avg=4.14s   min=875µs  med=5.77ms max=10.08s   p(90)=10s     p(95)=10s
+       { request_type:delayed }.....: avg=10s     min=10s    med=10s    max=10.08s   p(90)=10s     p(95)=10.01s
+       { request_type:instant }.....: avg=4.02ms  min=875µs  med=3.69ms max=83.37ms  p(90)=5.59ms  p(95)=6.03ms
+       { request_type:liveness }....: avg=7.37ms  min=1.37ms med=6.05ms max=111.4ms  p(90)=7.61ms  p(95)=8.04ms
+       { request_type:readiness }...: avg=7.31ms  min=1.46ms med=5.96ms max=111.37ms p(90)=7.51ms  p(95)=7.63ms
 ```
 **Observations:**
 - No apparent degradation to other endpoints. Interestingly, even the requests to `/delayed` have had a consistent performance.
 
+### Asynchronous Servlet Service (/delayed and /instant)
+```
+     http_req_duration..............: avg=4.09s   min=1.07ms med=4.79ms max=10.01s  p(90)=10s    p(95)=10s
+       { expected_response:true }...: avg=4.09s   min=1.07ms med=4.79ms max=10.01s  p(90)=10s    p(95)=10s
+       { request_type:delayed }.....: avg=9.87s   min=9.34s  med=10s    max=10.01s  p(90)=10s    p(95)=10s
+       { request_type:instant }.....: avg=3.63ms  min=1.07ms med=3.67ms max=9.75ms  p(90)=4.69ms p(95)=5.02ms
+       { request_type:liveness }....: avg=4.76ms  min=1.77ms med=4.73ms max=10.46ms p(90)=5.72ms p(95)=6.34ms
+       { request_type:readiness }...: avg=4.78ms  min=1.75ms med=4.78ms max=10.48ms p(90)=5.75ms p(95)=6.35ms
+```
+**Observations:**
+- Same as `Asyncronous Servlet Service`
+
 ### Reactive Service
 ```
-     http_req_duration..............: avg=2.22s   min=850µs    med=6.87ms max=9.99s    p(90)=7.75s  p(95)=8.8s
-       { expected_response:true }...: avg=2.22s   min=850µs    med=6.87ms max=9.99s    p(90)=7.75s  p(95)=8.8s
-     ✓ { request_type:delayed }.....: avg=5.13s   min=121.21ms med=5.09s  max=9.99s    p(90)=8.96s  p(95)=9.44s
-     ✓ { request_type:instant }.....: avg=4.69ms  min=850µs    med=4.19ms max=117.19ms p(90)=6.35ms p(95)=6.9ms
-     ✓ { request_type:liveness }....: avg=9.15ms  min=2.07ms   med=6.65ms max=141.73ms p(90)=8.91ms p(95)=10.06ms
-     ✓ { request_type:readiness }...: avg=9.15ms  min=2.07ms   med=6.63ms max=141.73ms p(90)=8.91ms p(95)=10.35ms
+     http_req_duration..............: avg=4.15s   min=951µs  med=6.91ms max=10.11s   p(90)=10s    p(95)=10s
+       { expected_response:true }...: avg=4.15s   min=951µs  med=6.91ms max=10.11s   p(90)=10s    p(95)=10s
+       { request_type:delayed }.....: avg=10s     min=10s    med=10s    max=10.11s   p(90)=10.01s p(95)=10.01s
+       { request_type:instant }.....: avg=4.99ms  min=951µs  med=4.7ms  max=111.82ms p(90)=6.52ms p(95)=7.03ms
+       { request_type:liveness }....: avg=9.44ms  min=5.1ms  med=7.08ms max=132.97ms p(90)=8.82ms p(95)=9.24ms
+       { request_type:readiness }...: avg=9.37ms  min=5.1ms  med=7.1ms  max=132.96ms p(90)=8.82ms p(95)=9.18ms
 ```
 **Observations:**
 - Same as `Asyncronous Servlet Service`
